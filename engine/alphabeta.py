@@ -4,6 +4,7 @@ from copy import deepcopy
 from sys import _getframe
 import config
 import pandas as pd
+from chess.polyglot import open_reader
 
 
 class TailCallSigil(Exception):
@@ -51,14 +52,15 @@ def tail_call(function):
 
 
 class Engine:
-    def __init__(self, color, max_depth):
+    def __init__(self, color="white", max_depth=2, opening_book="Perfect2017.bin"):
         self.board = chess.Board()
         self.eval_hash = {}
         self.board_hash = {}
         self.max_depth = max_depth
+        self.opening_book = opening_book
         if color == "white":
-            self.move("d2d4")
             self.minimax_scalar = -1
+            self._auto_respond(self.max_depth)
         else:
             self.minimax_scalar = 1
 
@@ -171,13 +173,18 @@ class Engine:
                 return value
 
     def _auto_respond(self, max_depth):
-        values = np.array(
-            [
-                self._alphabeta(self._move_copy(self.board, m), max_depth, 0)
-                for m in self.board.legal_moves
-            ]
-        )
-        chosen_move = list(self.board.legal_moves)[np.argmax(values)]
+        with chess.polyglot.open_reader(self.opening_book) as reader:
+            candidate_moves = list(reader.find_all(self.board))
+        if candidate_moves:
+            chosen_move = candidate_moves[0].move
+        else:
+            values = np.array(
+                [
+                    self._alphabeta(self._move_copy(self.board, m), max_depth, 0)
+                    for m in self.board.legal_moves
+                ]
+            )
+            chosen_move = list(self.board.legal_moves)[np.argmax(values)]
         print(f"response {chosen_move}")
         self.board.push(chosen_move)
         print(self.board)
