@@ -77,5 +77,7 @@ LOCATION_VALUE = {
 
 for piece in ["p", "n", "b", "r", "q", "k"]:
     PIECE_VALUE[piece.upper()] = PIECE_VALUE[piece] * -1
-    LOCATION_VALUE[piece.upper()] = pd.DataFrame(list(reversed(LOCATION_VALUE[piece]))) * -1
+    LOCATION_VALUE[piece.upper()] = (
+        pd.DataFrame(list(reversed(LOCATION_VALUE[piece]))) * -1
+    )
     LOCATION_VALUE[piece] = pd.DataFrame(LOCATION_VALUE[piece])

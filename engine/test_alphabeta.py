@@ -23,8 +23,10 @@ def test_evaluate(engine):
     assert engine.evaluate(BISHOP_STR) == 33
     assert engine.evaluate(QUEEN_STR) == -99
 
+
 def test_move(engine):
-    engine.move('d2d4')
-    assert str(engine.board) == 'r n b q k b n r\np p p p p p p p\n. . . . . . . .\n. . . . . . . .\n. . . P . . . .\n. . . . . . . .\nP P P . P P P P\nR N B Q K B N R'
-
-
+    engine.move("d2d4")
+    assert (
+        str(engine.board)
+        == "r n b q k b n r\np p p p p p p p\n. . . . . . . .\n. . . . . . . .\n. . . P . . . .\n. . . . . . . .\nP P P . P P P P\nR N B Q K B N R"
+    )

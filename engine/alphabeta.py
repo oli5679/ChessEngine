@@ -5,6 +5,7 @@ from sys import _getframe
 import config
 import pandas as pd
 
+
 class TailCallSigil(Exception):
     def __init__(self, args, kwargs):
         self.args = args
@@ -67,12 +68,15 @@ class Engine:
             return self.board_hash[board_str]
         else:
             board_df = pd.DataFrame([r.split(" ") for r in board_str.split("\n")])
-            evaluation = (
-                board_df.applymap(lambda x: config.PIECE_VALUE[x]).sum().sum()
-            )
+            evaluation = board_df.applymap(lambda x: config.PIECE_VALUE[x]).sum().sum()
             for piece in config.LOCATION_VALUE.keys():
-                evaluation += (board_df == piece).multiply(config.LOCATION_VALUE[piece]).sum().sum()
-            
+                evaluation += (
+                    (board_df == piece)
+                    .multiply(config.LOCATION_VALUE[piece])
+                    .sum()
+                    .sum()
+                )
+
             self.board_hash[board_str] = evaluation
             return evaluation
 
