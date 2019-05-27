@@ -1,9 +1,6 @@
 import chess
 import numpy as np
-board = chess.Board()
-
 from copy import deepcopy
-
 from sys import _getframe
 
 PIECE_VALUE = {'.': 0,
@@ -31,12 +28,6 @@ def tail_call(function):
 	A decorator for functions set up for tail call optimization. If your
 	function *isn't* set up for tail call optimization, this won't work
 	as intended.
-	
-	You should probably never use this.
-	
-	(Mutually recursive functions work, so long as all functions have the
-	`@tail_call` decorator.)
-	
 	"""
 	
 	def wrapper(*args, **kwargs):
@@ -80,7 +71,6 @@ class Engine():
         else:
             self.minimax_scalar = 1
         
-        
     def evaluate(self, board):
         board_str = str(board).split()
         evaluation = sum([PIECE_VALUE[p] for p in board_str])  
@@ -104,15 +94,15 @@ class Engine():
         
     def play(self, move):
         self.move(move)
-        if board.is_stalemate() or board.is_insufficient_material():
+        if self.board.is_stalemate() or self.board.is_insufficient_material() or self.board.can_claim_threefold_repetition():
             print('draw')
-        elif board.is_checkmate():
+        elif self.board.is_checkmate():
             print('you win')
         print()
-        self.auto_respond(self.max_depth)
-        if board.is_stalemate() or board.is_insufficient_material():
+        self._auto_respond(self.max_depth)
+        if self.board.is_stalemate() or self.board.is_insufficient_material() or  self.board.can_claim_threefold_repetition():
             print('draw')
-        elif board.is_checkmate():
+        elif self.board.is_checkmate():
             print('you lose')
     
     def _move_copy(self, board, move):
@@ -120,8 +110,6 @@ class Engine():
         copy_board.push(move)
         return copy_board
    
-            
-    #@tail_call
     def _alphabeta(self, board, max_depth, current_depth=0, alpha=-1e6, beta=1e6):
         if board.is_stalemate() or board.is_insufficient_material() or board.can_claim_threefold_repetition():
             return 0
@@ -159,7 +147,7 @@ class Engine():
                 self.eval_hash[hash_string]=value
                 return value
         
-    def auto_respond(self, max_depth):
+    def _auto_respond(self, max_depth):
         values = np.array([self._alphabeta(self._move_copy(self.board,m), max_depth, 0) for m in self.board.legal_moves])
         chosen_move = list(self.board.legal_moves)[np.argmax(values)]
         print(f'response {chosen_move}')
