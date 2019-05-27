@@ -65,22 +65,14 @@ class Engine:
             self.minimax_scalar = 1
 
     def evaluate(self, board):
-        board_str = str(board)
-        if board_str in self.board_hash:
-            return self.board_hash[board_str]
-        else:
-            board_df = pd.DataFrame([r.split(" ") for r in board_str.split("\n")])
-            evaluation = board_df.applymap(lambda x: config.PIECE_VALUE[x]).sum().sum()
-            for piece in config.LOCATION_VALUE.keys():
-                evaluation += (
-                    (board_df == piece)
-                    .multiply(config.LOCATION_VALUE[piece])
-                    .sum()
-                    .sum()
-                )
-
-            self.board_hash[board_str] = evaluation
-            return evaluation
+        board_list = str(board).split()
+        evaluation = 0
+        position = 0
+        for piece in board_list:
+            evaluation += config.PIECE_VALUE[piece]
+            evaluation += config.POSITION_VALUE[piece][position]
+            position += 1
+        return evaluation
 
     def move(self, move):
         print(f"move: {move}")
