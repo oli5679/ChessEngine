@@ -6,51 +6,6 @@ import config
 import pandas as pd
 from chess.polyglot import open_reader
 
-
-class TailCallSigil(Exception):
-    def __init__(self, args, kwargs):
-        self.args = args
-        self.kwargs = kwargs
-
-
-def tail_call(function):
-    """
-	A decorator for functions set up for tail call optimization. If your
-	function *isn't* set up for tail call optimization, this won't work
-	as intended.
-	"""
-
-    def wrapper(*args, **kwargs):
-        """
-		Wraps a function optimized for tail calls, allowing them to reuse the
-		stack.
-		
-		"""
-
-        try:
-            # Check to make sure we aren't our own grandparent.
-            frame_0, frame_2 = _getframe(0), _getframe(2)
-
-            if frame_2 and frame_0.f_code == frame_2.f_code:
-                raise TailCallSigil(args, kwargs)
-
-        except ValueError:
-            pass
-
-        while True:
-            try:
-                # Will be called decorated, hence the grandparents above.
-                result = function(*args, **kwargs)
-
-            except TailCallSigil as sigil:
-                args, kwargs = sigil.args, sigil.kwargs
-
-            else:
-                return result
-
-    return wrapper
-
-
 class Engine:
     def __init__(self, color="white", max_depth=2, opening_book="Perfect2017.bin"):
         self.board = chess.Board()
@@ -72,7 +27,7 @@ class Engine:
             evaluation += config.PIECE_VALUE[piece]
             evaluation += config.POSITION_VALUE[piece][position]
             position += 1
-        return evaluation
+        return evaluation * self.minimax_scalar 
 
     def move(self, move):
         print(f"move: {move}")
@@ -109,7 +64,6 @@ class Engine:
         if (
             board.is_stalemate()
             or board.is_insufficient_material()
-            or board.can_claim_threefold_repetition()
         ):
             return 0
         elif board.is_checkmate():
