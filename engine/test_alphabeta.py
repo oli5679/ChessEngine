@@ -12,6 +12,7 @@ QUEEN_STR = ". Q . . . . . .\n. . . . . . . .\n. . . . . . . .\n. . . . . . . .\
 def black_engine():
     return alphabeta.Engine(color="black", max_depth=1)
 
+
 def white_engine():
     return alphabeta.Engine(color="black", max_depth=1)
 
@@ -47,10 +48,17 @@ def test_play_book(black_engine):
 
 def out_of_book_black(black_engine):
     black_engine.move("e2e4")
-    black_engine.move('d7d5')
-    black_engine.play('b1a3')
-    assert str(black_engine.board) == 'r n b q k b n r\np p p . p p p p\n. . . . . . . .\n. . . . . . . .\n. . . . p . . .\nN . . . . . . .\nP P P P . P P P\nR . B Q K B N R'
+    black_engine.move("d7d5")
+    black_engine.play("b1a3")
+    assert (
+        str(black_engine.board)
+        == "r n b q k b n r\np p p . p p p p\n. . . . . . . .\n. . . . . . . .\n. . . . p . . .\nN . . . . . . .\nP P P P . P P P\nR . B Q K B N R"
+    )
+
 
 def out_of_book_white(white_engine):
-    white_engine.play('f7f5')
-    assert str(white_engine.board) == 'r n b q k b n r\np p p p p . p p\n. . . . . . . .\n. . . . . P . .\n. . . . . . . .\n. . . . . . . .\nP P P P . P P P\nR N B Q K B N R'
+    white_engine.play("f7f5")
+    assert (
+        str(white_engine.board)
+        == "r n b q k b n r\np p p p p . p p\n. . . . . . . .\n. . . . . P . .\n. . . . . . . .\n. . . . . . . .\nP P P P . P P P\nR N B Q K B N R"
+    )

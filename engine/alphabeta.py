@@ -6,6 +6,7 @@ import config
 import pandas as pd
 from chess.polyglot import open_reader
 
+
 class Engine:
     def __init__(self, color="white", max_depth=2, opening_book="Perfect2017.bin"):
         self.board = chess.Board()
@@ -27,7 +28,7 @@ class Engine:
             evaluation += config.PIECE_VALUE[piece]
             evaluation += config.POSITION_VALUE[piece][position]
             position += 1
-        return evaluation * self.minimax_scalar 
+        return evaluation * self.minimax_scalar
 
     def move(self, move):
         print(f"move: {move}")
@@ -61,10 +62,7 @@ class Engine:
         return copy_board
 
     def _alphabeta(self, board, max_depth, current_depth=0, alpha=-1e6, beta=1e6):
-        if (
-            board.is_stalemate()
-            or board.is_insufficient_material()
-        ):
+        if board.is_stalemate() or board.is_insufficient_material():
             return 0
         elif board.is_checkmate():
             if current_depth % 2 == 1:
