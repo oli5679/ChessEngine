@@ -11,9 +11,9 @@ class Engine:
     def __init__(self, color="white", max_depth=2, opening_book="Perfect2017.bin"):
         self.board = chess.Board()
         self.eval_hash = {}
-        self.board_hash = {}
         self.max_depth = max_depth
         self.opening_book = opening_book
+        self.board_hash = {}
         if color == "white":
             self.minimax_scalar = -1
             self._auto_respond(self.max_depth)
@@ -21,14 +21,20 @@ class Engine:
             self.minimax_scalar = 1
 
     def evaluate(self, board):
-        board_list = str(board).split()
-        evaluation = 0
-        position = 0
-        for piece in board_list:
-            evaluation += config.PIECE_VALUE[piece]
-            evaluation += config.POSITION_VALUE[piece][position]
-            position += 1
-        return evaluation * self.minimax_scalar
+        board_str = str(board)
+        evaluation = self.board_hash.get(board_str)
+        if evaluation:
+            return evaluation
+        else:
+            board_list = board_str.split()
+            evaluation, position = 0, 0
+            for piece in board_list:
+                evaluation += config.PIECE_VALUE[piece]
+                evaluation += config.POSITION_VALUE[piece][position]
+                position += 1
+            evaluation *= self.minimax_scalar
+            self.board_hash[board_str] = evaluation
+            return evaluation
 
     def move(self, move):
         print(f"move: {move}")
