@@ -8,7 +8,7 @@ from chess.polyglot import open_reader
 
 
 class Engine:
-    def __init__(self, color="white", max_depth=2, opening_book="Perfect2017.bin"):
+    def __init__(self, color="white", max_depth=2, opening_book="engine/Perfect2017.bin"):
         self.board = chess.Board()
         self.eval_hash = {}
         self.max_depth = max_depth
@@ -138,3 +138,7 @@ class Engine:
         print(f"response {chosen_move}")
         self.board.push(chosen_move)
         print(self.board)
+
+    def undo(self, num_undoes):
+        for i in range(num_undoes):
+            self.board.pop()
