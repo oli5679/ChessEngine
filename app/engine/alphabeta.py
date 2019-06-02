@@ -2,9 +2,10 @@ import chess
 import numpy as np
 from copy import deepcopy
 from sys import _getframe
-from engine  import config
+from engine import config
 import pandas as pd
 from chess.polyglot import open_reader
+
 
 class Engine:
     def __init__(self, max_depth=2, opening_book=config.OPENING_BOOK_PATH):
@@ -77,7 +78,7 @@ class Engine:
                 return -1e6
 
         else:
-        
+
             current_depth += 1
             if current_depth == max_depth:
                 value = self.evaluate(board)
@@ -89,7 +90,7 @@ class Engine:
                         value,
                         self._alphabeta(
                             self._move_copy(board, m),
-                            'white',
+                            "white",
                             max_depth,
                             current_depth,
                             alpha,
@@ -107,7 +108,7 @@ class Engine:
                         value,
                         self._alphabeta(
                             self._move_copy(board, m),
-                            'black',
+                            "black",
                             max_depth,
                             current_depth,
                             alpha,

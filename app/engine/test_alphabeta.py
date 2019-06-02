@@ -49,7 +49,9 @@ def test_out_of_book_black(engine):
         == "r n b q k b n r\np p p . p p p p\n. . . . . . . .\n. . . . . . . .\n. . . . p . . .\nN . . . . . . .\nP P P P . P P P\nR . B Q K B N R"
     )
 
-#def test_alphabeta_black(engine
+
+# def test_alphabeta_black(engine
+
 
 def test_out_of_book_white(engine):
     engine.move("e2e4")
@@ -61,4 +63,3 @@ def test_out_of_book_white(engine):
         result
         == "r n b q k b . r\n. p p p p p p p\n. . . . . P . .\np . . . . . . .\n. . . . . . . .\n. . . . . . . .\nP P P P . P P P\nR N B Q K B N R"
     )
-

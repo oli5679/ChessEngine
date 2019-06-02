@@ -5,8 +5,9 @@ import pytest
 import flask
 import server
 import easydict
-from engine import alphabeta 
+from engine import alphabeta
 import json
+
 
 @pytest.fixture
 def client():
@@ -27,31 +28,34 @@ def test_display_board(client):
         == b'{"board": "r n b q k b n r\\np p p p p p p p\\n. . . . . . . .\\n. . . . . . . .\\n. . . . . . . .\\n. . . . . . . .\\nP P P P P P P P\\nR N B Q K B N R"}'
     )
 
+
 def test_make_move(client):
-    response = client.post("/move",
-    data=json.dumps({'move':'e2e4'}))
+    response = client.post("/move", data=json.dumps({"move": "e2e4"}))
 
     assert response.status_code == 200
     assert (
         response.data
-        ==  b'{"board": "r n b q k b n r\\np p p p p p p p\\n. . . . . . . .\\n. . . . . . . .\\n. . . . P . . .\\n. . . . . . . .\\nP P P P . P P P\\nR N B Q K B N R"}'
+        == b'{"board": "r n b q k b n r\\np p p p p p p p\\n. . . . . . . .\\n. . . . . . . .\\n. . . . P . . .\\n. . . . . . . .\\nP P P P . P P P\\nR N B Q K B N R"}'
     )
 
+
 def test_make_move_and_get_response(client):
-    response = client.post("/play",
-    data=json.dumps({'move':'e7e5'}))
+    response = client.post("/play", data=json.dumps({"move": "e7e5"}))
     assert response.status_code == 200
-    assert len(json.loads(response.data)['board']) > 100                                                                                                                                  
+    assert len(json.loads(response.data)["board"]) > 100
+
 
 def test_evaluate(client):
     response = client.get("/evaluate")
     assert response.status_code == 200
-    assert json.loads(response.data)['evaluation'] > -1e7
+    assert json.loads(response.data)["evaluation"] > -1e7
+
 
 def test_reset_board(client):
     # todo
     assert True
 
+
 def test_undo_move(client):
-    # todo 
+    # todo
     assert True
