@@ -8,34 +8,27 @@ from chess.polyglot import open_reader
 
 
 class Engine:
-    def __init__(self, max_depth=2, opening_book="Perfect2017.bin"):
+    def __init__(self, max_depth=2, opening_book=config.OPENING_BOOK_PATH):
         self.board = chess.Board()
-        self.eval_hash = {}
         self.max_depth = max_depth
         self.opening_book = opening_book
-        self.board_hash = {}
         self.current_move = "white"
         self.game_state = "live"
 
     def evaluate(self, board):
         board_str = str(board)
-        evaluation = self.board_hash.get(board_str)
-        if evaluation:
-            return evaluation
-        else:
-            board_list = board_str.split()
-            evaluation, position = 0, 0
-            for piece in board_list:
-                evaluation += config.PIECE_VALUE[piece]
-                evaluation += config.POSITION_VALUE[piece][position]
-                position += 1
-            self.board_hash[board_str] = evaluation
-            return evaluation
+        board_list = board_str.split()
+        evaluation, position = 0, 0
+        for piece in board_list:
+            evaluation += config.PIECE_VALUE[piece]
+            evaluation += config.POSITION_VALUE[piece][position]
+            position += 1
+        return evaluation
 
     def move(self, move):
         self.board.push(chess.Move.from_uci(move))
         self.current_move = self._update_current_move(self.current_move)
-        return self.board
+        return str(self.board)
 
     def _update_current_move(self, current_move):
         if current_move == "white":
@@ -64,7 +57,7 @@ class Engine:
             response = self._auto_respond(self.max_depth)
             game_state = self._check_game_state()
             if game_state == "live":
-                return self.board
+                return str(self.board)
 
         return game_state
 
@@ -85,53 +78,48 @@ class Engine:
                 return -1e6
 
         else:
-            hash_string = board.fen() + f"depth{max_depth-current_depth}"
-            if hash_string in self.eval_hash.keys():
-                return self.eval_hash[hash_string]
+        
+            current_depth += 1
+            if current_depth == max_depth:
+                value = self.evaluate(board)
+
+            elif color == "black":
+                value = 1e6
+                for m in board.legal_moves:
+                    value = min(
+                        value,
+                        self._alphabeta(
+                            self._move_copy(board, m),
+                            'white',
+                            max_depth,
+                            current_depth,
+                            alpha,
+                            beta,
+                        ),
+                    )
+                    beta = min(value, beta)
+                    if alpha >= beta:
+                        break
+
             else:
-                current_depth += 1
-                next_color = self._update_current_move(color)
-                if current_depth == max_depth:
-                    value = self.evaluate(board)
+                value = -1e6
+                for m in board.legal_moves:
+                    value = max(
+                        value,
+                        self._alphabeta(
+                            self._move_copy(board, m),
+                            'black',
+                            max_depth,
+                            current_depth,
+                            alpha,
+                            beta,
+                        ),
+                    )
+                    alpha = max(value, alpha)
+                    if alpha >= beta:
+                        break
 
-                elif color == "black":
-                    value = 1e6
-                    for m in board.legal_moves:
-                        value = min(
-                            value,
-                            self._alphabeta(
-                                self._move_copy(board, m),
-                                next_color,
-                                max_depth,
-                                current_depth,
-                                alpha,
-                                beta,
-                            ),
-                        )
-                        beta = min(value, beta)
-                        if alpha >= beta:
-                            break
-
-                else:
-                    value = -1e6
-                    for m in board.legal_moves:
-                        value = max(
-                            value,
-                            self._alphabeta(
-                                self._move_copy(board, m),
-                                next_color,
-                                max_depth,
-                                current_depth,
-                                alpha,
-                                beta,
-                            ),
-                        )
-                        alpha = max(value, alpha)
-                        if alpha >= beta:
-                            break
-
-                self.eval_hash[hash_string] = value
-                return value
+            return value
 
     def _auto_respond(self, max_depth):
         with chess.polyglot.open_reader(self.opening_book) as reader:
@@ -143,17 +131,18 @@ class Engine:
             values = np.array(
                 [
                     self._alphabeta(
-                        self._move_copy(self.board, m), next_color, max_depth - 1, 0
+                        self._move_copy(self.board, m), next_color, max_depth, 1
                     )
                     for m in self.board.legal_moves
                 ]
             )
-            if self.color == "white":
+            if self.current_move == "white":
                 chosen_move = list(self.board.legal_moves)[np.argmax(values)]
             else:
                 chosen_move = list(self.board.legal_moves)[np.argmin(values)]
         self.board.push(chosen_move)
-        return self.board
+        self.current_move = self._update_current_move(self.current_move)
+        return str(self.board)
 
     def undo(self, num_undoes):
         for i in range(num_undoes):

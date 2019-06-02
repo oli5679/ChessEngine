@@ -1,6 +1,6 @@
-import pandas as pd
+PIECE_VALUE = {".": 0, "P": 10, "N": 30, "B": 35, "R": 50, "Q": 100, "K": 10000}
 
-PIECE_VALUE = {".": 0, "p": 10, "n": 30, "b": 35, "r": 50, "q": 100, "k": 10000}
+OPENING_BOOK_PATH = "/Users/oliver.cairns/Desktop/code/chess/app/engine/Perfect2017.bin"
 
 POSITION_VALUE = {
     ".": [
@@ -69,7 +69,7 @@ POSITION_VALUE = {
         0.0,
         0.0,
     ],
-    "p": [
+    "P": [
         0.0,
         0.0,
         0.0,
@@ -135,7 +135,7 @@ POSITION_VALUE = {
         0.0,
         0.0,
     ],
-    "n": [
+    "N": [
         -5.0,
         -4.0,
         -3.0,
@@ -201,7 +201,7 @@ POSITION_VALUE = {
         -4.0,
         -5.0,
     ],
-    "b": [
+    "B": [
         -2.0,
         -1.0,
         -1.0,
@@ -267,7 +267,7 @@ POSITION_VALUE = {
         -1.0,
         -2.0,
     ],
-    "r": [
+    "R": [
         0.0,
         0.0,
         0.0,
@@ -333,7 +333,7 @@ POSITION_VALUE = {
         0.0,
         0.0,
     ],
-    "q": [
+    "Q": [
         -2.0,
         -1.0,
         -1.0,
@@ -399,7 +399,7 @@ POSITION_VALUE = {
         -1.0,
         -2.0,
     ],
-    "k": [
+    "K": [
         -3.0,
         -4.0,
         -4.0,
@@ -467,6 +467,6 @@ POSITION_VALUE = {
     ],
 }
 
-for piece in ["p", "n", "b", "r", "q", "k"]:
-    PIECE_VALUE[piece.upper()] = PIECE_VALUE[piece] * -1
-    POSITION_VALUE[piece.upper()] = [v * -1 for v in reversed(POSITION_VALUE[piece])]
+for piece in ["P", "N", "B", "R", "Q", "K"]:
+    PIECE_VALUE[piece.lower()] = PIECE_VALUE[piece] * -1
+    POSITION_VALUE[piece.lower()] = [v * -1 for v in reversed(POSITION_VALUE[piece])]

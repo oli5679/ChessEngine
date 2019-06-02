@@ -20,9 +20,9 @@ def test_engine_creation():
 
 def test_evaluate(engine):
     assert engine.evaluate(engine.board) == 0
-    assert engine.evaluate(ROOK_STR) == 50
-    assert engine.evaluate(BISHOP_STR) == 33
-    assert engine.evaluate(QUEEN_STR) == -99
+    assert engine.evaluate(ROOK_STR) == -50
+    assert engine.evaluate(BISHOP_STR) == -33
+    assert engine.evaluate(QUEEN_STR) == 99
 
 
 def test_move(engine):
@@ -50,8 +50,10 @@ def test_out_of_book_black(engine):
         == "r n b q k b n r\np p p . p p p p\n. . . . . . . .\n. . . . . . . .\n. . . . p . . .\nN . . . . . . .\nP P P P . P P P\nR . B Q K B N R"
     )
 
+#def test_alphabeta_black(engine
 
 def test_out_of_book_white(engine):
+    engine.move("e2e4")
     engine.move("g8f6")
     engine.move("e4e5")
     result = engine.play("a7a5")
