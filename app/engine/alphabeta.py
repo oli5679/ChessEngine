@@ -8,7 +8,7 @@ from chess.polyglot import open_reader
 
 
 class Engine:
-    def __init__(self, max_depth=2, opening_book="engine/Perfect2017.bin"):
+    def __init__(self, max_depth=2, opening_book="Perfect2017.bin"):
         self.board = chess.Board()
         self.eval_hash = {}
         self.max_depth = max_depth
@@ -37,7 +37,7 @@ class Engine:
         self.current_move = self._update_current_move(self.current_move)
         return self.board
 
-    def _update_currrent_move(self, current_move):
+    def _update_current_move(self, current_move):
         if current_move == "white":
             return "black"
         else:
@@ -52,27 +52,27 @@ class Engine:
             self.game_state = "draw"
             return self.game_state
         elif self.board.is_checkmate():
-            self._game_state = f"{self.current_move} win"
+            self.game_state = f"{self.current_move} win"
             return self.game_state
+        else:
+            return 'live'
 
     def play(self, move):
         self.move(move)
-        game_state_before = self._game_state()
-        if game_state_before == "live":
+        game_state = self._check_game_state()
+        if game_state == "live":
             response = self._auto_respond(self.max_depth)
-        else:
-            return game_state_before
-        game_state_after = self._game_state()
-        if game_state_after == "live":
-            return self.board
-        else:
-            return game_state_after
+            game_state = self._check_game_state()
+            if game_state == "live":
+                return self.board
+        
+        return game_state
+        
 
-    def _move_copy(self, board, color, move):
+    def _move_copy(self, board, move):
         copy_board = deepcopy(board)
         copy_board.push(move)
-        self.color = self._update_currrent_move(color)
-        return (copy_board, color)
+        return copy_board
 
     def _alphabeta(
         self, board, color, max_depth, current_depth=0, alpha=-1e6, beta=1e6
@@ -91,7 +91,7 @@ class Engine:
                 return self.eval_hash[hash_string]
             else:
                 current_depth += 1
-                next_color = self._update_currrent_move(self, color)
+                next_color = self._update_current_move(color)
                 if current_depth == max_depth:
                     value = self.evaluate(board)
 
@@ -140,10 +140,11 @@ class Engine:
         if candidate_moves:
             chosen_move = candidate_moves[0].move
         else:
-            next_color = self._update_currrent_move(self.current_move)
+            next_color = self._update_current_move(self.current_move)
             values = np.array(
                 [
                     self._alphabeta(
+
                         self._move_copy(self.board, m), next_color, max_depth - 1, 0
                     )
                     for m in self.board.legal_moves
