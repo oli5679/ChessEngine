@@ -26,14 +26,17 @@ def test_evaluate(engine):
 
 
 def test_move(engine):
-    assert engine.move("d2d4") == "r n b q k b n r\np p p p p p p p\n. . . . . . . .\n. . . . . . . .\n. . . P . . . .\n. . . . . . . .\nP P P . P P P P\nR N B Q K B N R"
+    assert (
+        engine.move("d2d4")
+        == "r n b q k b n r\np p p p p p p p\n. . . . . . . .\n. . . . . . . .\n. . . P . . . .\n. . . . . . . .\nP P P . P P P P\nR N B Q K B N R"
+    )
 
 
 def test_play_book(engine):
     engine.play("e2e4")
     response = engine.play("g1f3")
     assert (
-        response 
+        response
         == "r n b q k b n r\np p . . p p p p\n. . . p . . . .\n. . p . . . . .\n. . . . P . . .\n. . . . . N . .\nP P P P . P P P\nR N B Q K B . R"
     )
 
@@ -54,6 +57,6 @@ def test_out_of_book_white(engine):
     result = engine.play("a7a5")
 
     assert (
-        result 
+        result
         == "r n b q k b . r\n. p p p p p p p\n. . . . . P . .\np . . . . . . .\n. . . . . . . .\n. . . . . . . .\nP P P P . P P P\nR N B Q K B N R"
     )

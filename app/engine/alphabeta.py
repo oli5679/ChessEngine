@@ -55,7 +55,7 @@ class Engine:
             self.game_state = f"{self.current_move} win"
             return self.game_state
         else:
-            return 'live'
+            return "live"
 
     def play(self, move):
         self.move(move)
@@ -65,9 +65,8 @@ class Engine:
             game_state = self._check_game_state()
             if game_state == "live":
                 return self.board
-        
+
         return game_state
-        
 
     def _move_copy(self, board, move):
         copy_board = deepcopy(board)
@@ -144,7 +143,6 @@ class Engine:
             values = np.array(
                 [
                     self._alphabeta(
-
                         self._move_copy(self.board, m), next_color, max_depth - 1, 0
                     )
                     for m in self.board.legal_moves
