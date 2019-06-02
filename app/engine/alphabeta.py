@@ -8,17 +8,14 @@ from chess.polyglot import open_reader
 
 
 class Engine:
-    def __init__(self, color="white", max_depth=2, opening_book="engine/Perfect2017.bin"):
+    def __init__(self, max_depth=2, opening_book="engine/Perfect2017.bin"):
         self.board = chess.Board()
         self.eval_hash = {}
         self.max_depth = max_depth
         self.opening_book = opening_book
         self.board_hash = {}
-        if color == "white":
-            self.minimax_scalar = -1
-            self._auto_respond(self.max_depth)
-        else:
-            self.minimax_scalar = 1
+        self.current_move = "white"
+        self.game_state = "live"
 
     def evaluate(self, board):
         board_str = str(board)
@@ -32,46 +29,58 @@ class Engine:
                 evaluation += config.PIECE_VALUE[piece]
                 evaluation += config.POSITION_VALUE[piece][position]
                 position += 1
-            evaluation *= self.minimax_scalar
             self.board_hash[board_str] = evaluation
             return evaluation
 
     def move(self, move):
-        print(f"move: {move}")
         self.board.push(chess.Move.from_uci(move))
-        print(self.board)
+        self.current_move = self._update_current_move(self.current_move)
+        return self.board
+
+    def _update_currrent_move(self, current_move):
+        if current_move == "white":
+            return "black"
+        else:
+            return "white"
+
+    def _check_game_state(self):
+        if (
+            self.board.is_stalemate()
+            or self.board.is_insufficient_material()
+            or self.board.can_claim_threefold_repetition()
+        ):
+            self.game_state = "draw"
+            return self.game_state
+        elif self.board.is_checkmate():
+            self._game_state = f"{self.current_move} win"
+            return self.game_state
 
     def play(self, move):
         self.move(move)
-        if (
-            self.board.is_stalemate()
-            or self.board.is_insufficient_material()
-            or self.board.can_claim_threefold_repetition()
-        ):
-            print("draw")
-        elif self.board.is_checkmate():
-            print("you win")
-        print()
-        self._auto_respond(self.max_depth)
-        if (
-            self.board.is_stalemate()
-            or self.board.is_insufficient_material()
-            or self.board.can_claim_threefold_repetition()
-        ):
-            print("draw")
-        elif self.board.is_checkmate():
-            print("you lose")
+        game_state_before = self._game_state()
+        if game_state_before == "live":
+            response = self._auto_respond(self.max_depth)
+        else:
+            return game_state_before
+        game_state_after = self._game_state()
+        if game_state_after == "live":
+            return self.board
+        else:
+            return game_state_after
 
-    def _move_copy(self, board, move):
+    def _move_copy(self, board, color, move):
         copy_board = deepcopy(board)
         copy_board.push(move)
-        return copy_board
+        self.color = self._update_currrent_move(color)
+        return (copy_board, color)
 
-    def _alphabeta(self, board, max_depth, current_depth=0, alpha=-1e6, beta=1e6):
+    def _alphabeta(
+        self, board, color, max_depth, current_depth=0, alpha=-1e6, beta=1e6
+    ):
         if board.is_stalemate() or board.is_insufficient_material():
             return 0
         elif board.is_checkmate():
-            if current_depth % 2 == 1:
+            if color == "white":
                 return 1e6
             else:
                 return -1e6
@@ -82,16 +91,18 @@ class Engine:
                 return self.eval_hash[hash_string]
             else:
                 current_depth += 1
+                next_color = self._update_currrent_move(self, color)
                 if current_depth == max_depth:
                     value = self.evaluate(board)
 
-                elif current_depth % 2 == 1:
+                elif color == "black":
                     value = 1e6
                     for m in board.legal_moves:
                         value = min(
                             value,
                             self._alphabeta(
                                 self._move_copy(board, m),
+                                next_color,
                                 max_depth,
                                 current_depth,
                                 alpha,
@@ -109,6 +120,7 @@ class Engine:
                             value,
                             self._alphabeta(
                                 self._move_copy(board, m),
+                                next_color,
                                 max_depth,
                                 current_depth,
                                 alpha,
@@ -128,16 +140,21 @@ class Engine:
         if candidate_moves:
             chosen_move = candidate_moves[0].move
         else:
+            next_color = self._update_currrent_move(self.current_move)
             values = np.array(
                 [
-                    self._alphabeta(self._move_copy(self.board, m), max_depth, 0)
+                    self._alphabeta(
+                        self._move_copy(self.board, m), next_color, max_depth - 1, 0
+                    )
                     for m in self.board.legal_moves
                 ]
             )
-            chosen_move = list(self.board.legal_moves)[np.argmax(values)]
-        print(f"response {chosen_move}")
+            if self.color == "white":
+                chosen_move = list(self.board.legal_moves)[np.argmax(values)]
+            else:
+                chosen_move = list(self.board.legal_moves)[np.argmin(values)]
         self.board.push(chosen_move)
-        print(self.board)
+        return self.board
 
     def undo(self, num_undoes):
         for i in range(num_undoes):
