@@ -1,4 +1,3 @@
-import config
 import alphabeta
 import pytest
 from time import sleep
@@ -62,3 +61,4 @@ def test_out_of_book_white(engine):
         result
         == "r n b q k b . r\n. p p p p p p p\n. . . . . P . .\np . . . . . . .\n. . . . . . . .\n. . . . . . . .\nP P P P . P P P\nR N B Q K B N R"
     )
+

@@ -2,10 +2,9 @@ import chess
 import numpy as np
 from copy import deepcopy
 from sys import _getframe
-import config
+from engine  import config
 import pandas as pd
 from chess.polyglot import open_reader
-
 
 class Engine:
     def __init__(self, max_depth=2, opening_book=config.OPENING_BOOK_PATH):

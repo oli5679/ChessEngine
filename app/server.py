@@ -1,11 +1,11 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import json
 
 from engine import alphabeta
 
 app = Flask(__name__)
 
-game = alphabeta.Engine(color="black", max_depth=3)
+game = alphabeta.Engine(max_depth=3)
 
 
 @app.errorhandler(404)
@@ -26,7 +26,7 @@ def display_board():
 
 @app.route("/move", methods=["POST"])
 def make_move():
-    game_inputs = request.json
+    game_inputs = json.loads(request.data)
     global game
     game.move(game_inputs["move"])
     return json.dumps({"board": str(game.board)})
@@ -34,7 +34,7 @@ def make_move():
 
 @app.route("/play", methods=["POST"])
 def play_move_and_get_response():
-    game_inputs = request.json
+    game_inputs = json.loads(request.data)
     global game
     game.play(game_inputs["move"])
     return json.dumps({"board": str(game.board)})
@@ -42,7 +42,6 @@ def play_move_and_get_response():
 
 @app.route("/undo", methods=["POST"])
 def undo():
-    game_inputs = request.json
     global game
     game.undo(1)
     return json.dumps({"board": str(game.board)})
@@ -50,10 +49,17 @@ def undo():
 
 @app.route("/evaluate", methods=["GET"])
 def eval():
-    game_inputs = request.json
     global game
     evaluation = game.evaluate(game.board)
     return json.dumps({"evaluation": evaluation})
+
+
+@app.route("/reset", methods=["POST"])
+def reset():
+    global game
+    game = alphabeta.Engine(max_depth=3)
+    return json.dumps({"board": str(game.board)})
+
 
 
 if __name__ == "__main__":
