@@ -4,10 +4,12 @@ from flask_cors import CORS
 from engine import alphabeta
 import chess
 
+MAX_DEPTH = 5
+
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
-game = alphabeta.Engine(max_depth=3)
+game = alphabeta.Engine(max_depth=MAX_DEPTH)
 
 
 @app.errorhandler(404)
@@ -61,7 +63,7 @@ def eval():
 @app.route("/reset", methods=["GET"])
 def reset():
     global game
-    game = alphabeta.Engine(max_depth=3)
+    game = alphabeta.Engine(max_depth=MAX_DEPTH)
     return json.dumps({"board": str(game.board)})
 
 
