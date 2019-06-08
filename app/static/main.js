@@ -4,6 +4,34 @@ $(document).ready(function () {
     var board,
     game = new Chess();
   
+    // reset game
+    $.ajax({
+        url: "http://0.0.0.0:5000/reset",
+        success: function( response ) {
+            console.log(response); // server response
+            console.log('Reset engine')
+        }
+    });
+
+    // start with e2e4 - for now engine is always white
+    $.ajax({
+        url: 'http://0.0.0.0:5000/move',
+        dataType: 'json',
+        type: 'post',
+        contentType: 'application/json',
+        data: JSON.stringify( { "move": "e2e4" } ),
+        success: function( data, textStatus, jQxhr ){
+            console.log(data);
+            console.log('played e2e4')
+        },
+        error: function( jqXhr, textStatus, errorThrown ){
+            console.log( errorThrown );
+        }
+    });
+
+    
+
+
   // do not pick up pieces if the game is over
   // only pick up pieces for White
   var onDragStart = function(source, piece, position, orientation) {
@@ -13,13 +41,15 @@ $(document).ready(function () {
     }
   };
   
-  var makeRandomMove = function() {
+  var playAI = function() {
     var possibleMoves = game.moves();
   
     // game over
     if (possibleMoves.length === 0) return;
   
-    var randomIndex = Math.floor(Math.random() * possibleMoves.length);
+    var response = $.ajax({url: "demo_test.txt", success: function(result){
+        $("#div1").html(result);
+      }});;
     game.move(possibleMoves[randomIndex]);
     board.position(game.fen());
   };
@@ -31,6 +61,11 @@ $(document).ready(function () {
       to: target,
       promotion: 'q' // NOTE: always promote to a queen for example simplicity
     });
+      
+      var move_string = source + target;
+      console.log(move);
+
+      
   
     // illegal move
     if (move === null) return 'snapback';

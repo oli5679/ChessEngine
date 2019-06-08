@@ -57,7 +57,7 @@ class Engine:
             response = self._auto_respond(self.max_depth)
             game_state = self._check_game_state()
             if game_state == "live":
-                return str(self.board)
+                return response
 
         return game_state
 
@@ -142,7 +142,7 @@ class Engine:
                 chosen_move = list(self.board.legal_moves)[np.argmin(values)]
         self.board.push(chosen_move)
         self.current_move = self._update_current_move(self.current_move)
-        return str(self.board)
+        return chosen_move
 
     def undo(self, num_undoes):
         for i in range(num_undoes):
