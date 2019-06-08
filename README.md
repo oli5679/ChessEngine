@@ -1,3 +1,3 @@
-# conventionalfish
+# normalfish
 
 Basic Python chess engine!
