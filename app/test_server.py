@@ -42,7 +42,7 @@ def test_make_move(client):
 def test_make_move_and_get_response(client):
     response = client.post("/play", data=json.dumps({"move": "e7e5"}))
     assert response.status_code == 200
-    assert len(json.loads(response.data)["board"]) > 100
+    assert response.data == b'{"from": "g1", "to": "f3"}'
 
 
 def test_evaluate(client):

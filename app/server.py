@@ -2,6 +2,7 @@ import flask
 import json
 from flask_cors import CORS
 from engine import alphabeta
+import chess
 
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
@@ -37,8 +38,10 @@ def make_move():
 def play_move_and_get_response():
     game_inputs = json.loads(flask.request.data)
     global game
-    game.play(game_inputs["move"])
-    return json.dumps({"board": str(game.board)})
+    ai_response = chess.Move.from_uci(game.play(game_inputs["move"]))
+    from_square = chess.SQUARE_NAMES[ai_response.from_square]
+    to_square = chess.SQUARE_NAMES[ai_response.to_square]
+    return json.dumps({"from": from_square, "to": to_square})
 
 
 @app.route("/undo", methods=["POST"])

@@ -1,16 +1,21 @@
 
 
-$(document).ready(function () {
-    var board,
-    game = new Chess();
+$(document).ready(function () {  
+  var board,
+  game = new Chess();
+  game.move({
+    from: 'e2',
+    to: 'e4',
+  });
   
     // reset game
     $.ajax({
-        url: "http://0.0.0.0:5000/reset",
+      url: "http://0.0.0.0:5000/reset",
         success: function( response ) {
             console.log(response); // server response
             console.log('Reset engine')
-        }
+        },
+        async: false
     });
 
     // start with e2e4 - for now engine is always white
@@ -26,32 +31,59 @@ $(document).ready(function () {
         },
         error: function( jqXhr, textStatus, errorThrown ){
             console.log( errorThrown );
-        }
+      },
+      async: false
     });
 
+    function makeRandomMove () {
+      var possibleMoves = game.moves()
     
+      // game over
+      if (possibleMoves.length === 0) return
+    
+      var randomIdx = Math.floor(Math.random() * possibleMoves.length)
+      game.move(possibleMoves[randomIdx])
+      board.position(game.fen())
+    }
 
 
   // do not pick up pieces if the game is over
   // only pick up pieces for White
   var onDragStart = function(source, piece, position, orientation) {
     if (game.in_checkmate() === true || game.in_draw() === true ||
-      piece.search(/^b/) !== -1) {
+      piece.search(/^w/) !== -1) {
       return false;
     }
   };
   
-  var playAI = function() {
+  var playAI = function(move_string) {
     var possibleMoves = game.moves();
   
     // game over
     if (possibleMoves.length === 0) return;
   
-    var response = $.ajax({url: "demo_test.txt", success: function(result){
-        $("#div1").html(result);
-      }});;
-    game.move(possibleMoves[randomIndex]);
-    board.position(game.fen());
+    $.ajax({
+      url: 'http://0.0.0.0:5000/play',
+      dataType: 'json',
+      type: 'post',
+      contentType: 'application/json',
+      data: JSON.stringify( { "move": move_string } ),
+      success: function( data, textStatus, jQxhr ){
+        console.log(data);
+        console.log('got response');
+        game.move({
+          from: data['from'],
+          to: data['to'],
+        })
+        board.position(game.fen());
+        console.log(game.fen());
+      },
+      error: function( jqXhr, textStatus, errorThrown ){
+          console.log( errorThrown );
+      },
+      async: false
+  });
+    
   };
   
   var onDrop = function(source, target) {
@@ -63,15 +95,15 @@ $(document).ready(function () {
     });
       
       var move_string = source + target;
-      console.log(move);
+      console.log(move_string);
 
       
   
     // illegal move
     if (move === null) return 'snapback';
   
-    // make random legal move for black
-    window.setTimeout(makeRandomMove, 250);
+    // get AI response from black
+    playAI(move_string);    
   };
   
   // update the board position after the piece snap
@@ -82,7 +114,7 @@ $(document).ready(function () {
   
   var cfg = {
     draggable: true,
-    position: 'start',
+    position: "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1",
     onDragStart: onDragStart,
     onDrop: onDrop,
     onSnapEnd: onSnapEnd

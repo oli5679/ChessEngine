@@ -57,7 +57,7 @@ class Engine:
             response = self._auto_respond(self.max_depth)
             game_state = self._check_game_state()
             if game_state == "live":
-                return response
+                return str(response)
 
         return game_state
 

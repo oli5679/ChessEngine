@@ -1,7 +1,6 @@
 import alphabeta
 import pytest
 from time import sleep
-import chess
 
 ROOK_STR = "r . . . . . . .\n. . . . . . . .\n. . . . . . . .\n. . . . . . . .\n. . . . . . . .\n. . . . . . . .\n. . . . . . . .\n. . . . . . . ."
 BISHOP_STR = ". . . . . . . b\n. . . . . . . .\n. . . . . . . .\n. . . . . . . .\n. . . . . . . .\n. . . . . . . .\n. . . . . . . .\n. . . . . . . ."
@@ -35,14 +34,14 @@ def test_move(engine):
 def test_play_book(engine):
     engine.play("e2e4")
     response = engine.play("g1f3")
-    assert response == chess.Move.from_uci("d7d6")
+    assert response == "d7d6"
 
 
 def test_out_of_book_black(engine):
     engine.move("e2e4")
     engine.move("d7d5")
     response = engine.play("b1a3")
-    assert response == chess.Move.from_uci("d5e4")
+    assert response == "d5e4"
 
 
 def test_out_of_book_white(engine):
@@ -51,4 +50,4 @@ def test_out_of_book_white(engine):
     engine.move("e4e5")
     result = engine.play("a7a5")
 
-    assert result == chess.Move.from_uci("e5f6")
+    assert result == "e5f6"
