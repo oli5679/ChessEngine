@@ -1,6 +1,6 @@
 PIECE_VALUE = {".": 0, "P": 10, "N": 30, "B": 35, "R": 50, "Q": 100, "K": 10000}
 
-OPENING_BOOK_PATH = "/Users/oliver.cairns/Desktop/code/chess/app/engine/Perfect2017.bin"
+OPENING_BOOK_PATH = "/Users/olivercairns/Desktop/code/ChessEngine/app/engine/Perfect2017.bin"
 
 POSITION_VALUE = {
     ".": [
