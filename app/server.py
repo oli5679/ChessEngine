@@ -4,7 +4,7 @@ from flask_cors import CORS
 from engine import alphabeta
 import chess
 
-MAX_DEPTH = 4
+MAX_DEPTH = 5
 
 app = flask.Flask(__name__)
 CORS(app)  # This will enable CORS for all routes

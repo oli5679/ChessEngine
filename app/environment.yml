@@ -1,0 +1,29 @@
+name: ChessEngine
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - black
+  - flask
+  - flask-cors
+  - ipython
+  - jupyter
+  - jupyter_client
+  - jupyter_console
+  - jupyter_core
+  - jupyterlab
+  - jupyterlab_server
+  - lightgbm
+  - matplotlib
+  - matplotlib-base
+  - numba
+  - numpy
+  - pandas
+  - patsy
+  - pip
+  - pytest
+  - python=3.7.3
+  - pip:
+    - python-chess
+    - easydict
+prefix: //anaconda3/envs/ChessEngine
