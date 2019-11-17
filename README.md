@@ -20,11 +20,11 @@ NOTE - Dockerfile not working yet
 
 ## Run tests
 
-pytest app/server.py
+    pytest app/server.py
 
 ## Run server
 
-python app/server.py
+    python app/server.py
 
 ## Play API
 
